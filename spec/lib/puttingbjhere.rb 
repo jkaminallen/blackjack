@@ -1,0 +1,109 @@
+#bj
+
+require_relative "card"
+require_relative "deck"
+require_relative "hand"
+
+deck = Deck.new
+player = Hand.new
+computer = Hand.new
+
+# puts "Welcome to Blackjack!\n\n"
+# player.add_card(deck.deal(2))
+#
+# puts "Player was dealt #{card.card_output}"
+
+#deck.rb
+class Deck
+  attr_accessor :cards
+
+  SUITS = ['♦', '♣', '♠', '♥']
+  VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A']
+
+  def initialize
+    @cards = build_deck
+  end
+
+  def build_deck
+    cards = []
+    SUITS.each do |suit|
+      VALUES.each do |value|
+        cards << Card.new(value, suit)
+      end
+    end
+    cards.shuffle!
+  end
+
+  def deal(number_of_cards)
+    cards.pop(number_of_cards)
+  end
+end
+
+#hand.rb
+require_relative 'deck'
+require_relative 'card'
+require_relative 'hand'
+
+class Hand
+  attr_reader :cards
+
+  def initialize
+    @cards = []
+  end
+
+
+  def calculate_hand
+    sum = 0
+    @cards.each do |card|
+      if card.face_card
+         sum += 10
+      elsif card.is_ace && sum >= 11
+        sum += 1
+      elsif card.is_ace
+        sum += 11
+      else
+        sum += card.value.to_i
+      end
+    end
+    @cards.each do |card|
+      if sum > 21 && card.is_ace
+        sum -= 10
+      end
+    end
+    sum
+  end
+
+  def add_card(card)
+    @cards << card
+    @cards.flatten!
+  end
+
+  # def print_hand
+  #   @cards.each do |card|
+  #     puts "Player Hand: #{card.card_output}"
+  #   end
+  #   puts "Total Score: #{calculate_hand}"
+  # end
+end
+
+#card.rb
+class Card
+  attr_reader :value, :suit
+
+  def initialize(value, suit)
+    @value = value
+    @suit = suit
+  end
+
+  def face_card
+    @value == "J"|| @value == "Q" || @value == "K"
+  end
+
+  def is_ace
+    @value == "A"
+  end
+
+  # def card_output
+  #   "#{value}#{suit}"
+  # end
+end
